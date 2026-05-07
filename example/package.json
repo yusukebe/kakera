@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "hono": "^4.7.0",
-    "kakera": "file:.."
+    "kakera-worker": "file:.."
   },
   "devDependencies": {
     "typescript": "^6.0.3",

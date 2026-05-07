@@ -1,1 +1,1 @@
-export { default } from 'kakera/prod'
+export { default } from 'kakera-worker/prod'

@@ -9,7 +9,7 @@ A file-based routing framework for Cloudflare Workers. Each route file runs as a
 ## Install
 
 ```sh
-npm i kakera
+npm i kakera-worker
 ```
 
 ## How it looks
@@ -46,11 +46,11 @@ The host Worker dispatches by the first path segment (`/users/123` → `users.ts
 
 ### Dev: zero build step
 
-`kakera/dev` runtime-bundles `routes/*.ts` via `@cloudflare/worker-bundler` on first request. Edit a route and it's reflected immediately (LOADER cache is keyed by source hash).
+`kakera-worker/dev` runtime-bundles `routes/*.ts` via `@cloudflare/worker-bundler` on first request. Edit a route and it's reflected immediately (LOADER cache is keyed by source hash).
 
 ```ts
 // src/dev.ts
-import { dev } from 'kakera/dev'
+import { dev } from 'kakera-worker/dev'
 import pkg from '../package.json'
 
 export default dev({ dependencies: pkg.dependencies })
@@ -60,17 +60,17 @@ export default dev({ dependencies: pkg.dependencies })
 
 ### Prod: pre-built, tiny host
 
-`kakera/prod` reads pre-built `.js` bundles from the assets directory. The host worker is **~1.6 KiB** — `@cloudflare/worker-bundler` is fully tree-shaken out.
+`kakera-worker/prod` reads pre-built `.js` bundles from the assets directory. The host worker is **~1.6 KiB** — `@cloudflare/worker-bundler` is fully tree-shaken out.
 
 ```ts
 // src/prod.ts
-export { default } from 'kakera/prod'
+export { default } from 'kakera-worker/prod'
 ```
 
 Or with options:
 
 ```ts
-import { prod } from 'kakera/prod'
+import { prod } from 'kakera-worker/prod'
 export default prod({ dir: 'subdir' }) // fetches subdir/<name>.js via ASSETS
 ```
 
@@ -121,7 +121,7 @@ bun run dev
 
 |                          | dev                                          | prod                          |
 | ------------------------ | -------------------------------------------- | ----------------------------- |
-| Host entry               | `src/dev.ts` (`kakera/dev`)                  | `src/prod.ts` (`kakera/prod`) |
+| Host entry               | `src/dev.ts` (`kakera-worker/dev`)           | `src/prod.ts` (`kakera-worker/prod`) |
 | Route source on disk     | `routes/<name>.ts`                           | `dist/<name>.js` (built)      |
 | ASSETS binding directory | `routes`                                     | `dist` (via `--assets dist`)  |
 | Bundling                 | runtime via `@cloudflare/worker-bundler`     | build-time via `bun build`    |

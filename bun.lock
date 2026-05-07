@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "kakera",
+      "name": "kakera-worker",
       "dependencies": {
         "@cloudflare/worker-bundler": "^0.1.3",
       },
