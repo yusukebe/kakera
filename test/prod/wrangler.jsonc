@@ -1,5 +1,5 @@
 {
-  "name": "workers-routes-test-prod",
+  "name": "kakera-test-prod",
   "main": "./worker.ts",
   "compatibility_date": "2026-03-17",
   "assets": {

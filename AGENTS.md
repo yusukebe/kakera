@@ -1,37 +1,39 @@
-# workers-routes
+# Kakera
+
+> **Kakera** (欠片) — Japanese for "fragment" / "shard". Each route is a fragment that runs as its own isolated worker.
 
 A file-based routing framework for Cloudflare Workers. Each route file runs as an **independent Dynamic Worker** loaded via the Worker Loader binding. Hosts ship in two flavors:
 
-- `workers-routes/dev` — runtime-bundles `routes/*.ts` via `@cloudflare/worker-bundler`. No build step.
-- `workers-routes/prod` — reads pre-built `.js` bundles via ASSETS. `@cloudflare/worker-bundler` is fully tree-shaken out, so the prod host bundle is ~1.6 KiB.
+- `kakera/dev` — runtime-bundles `routes/*.ts` via `@cloudflare/worker-bundler`. No build step.
+- `kakera/prod` — reads pre-built `.js` bundles via ASSETS. `@cloudflare/worker-bundler` is fully tree-shaken out, so the prod host bundle is ~1.6 KiB.
 
 The split is intentional: it lets dev have zero build orchestration while prod stays tiny.
 
 ## Repository layout
 
 ```
-workers-routes/
+kakera/
   src/
-    shared.ts         # shared types (WorkersRoutesBindings) + makeHandler factory
+    shared.ts         # shared types (KakeraBindings) + makeHandler factory
     dev.ts            # exports default + named `dev(options)` factory
     prod.ts           # exports default + named `prod(options)` factory
     index.ts          # type-only barrel (no runtime re-exports — see below)
   example/
     routes/{index,users}.ts   # source — what dev mode reads
     src/dev.ts        # consumer entry: imports `dev` and passes pkg.dependencies
-    src/prod.ts       # consumer entry: re-exports default of `workers-routes/prod`
+    src/prod.ts       # consumer entry: re-exports default of `kakera/prod`
     wrangler.jsonc
     package.json
-  package.json        # workers-routes (private until API stabilizes)
+  package.json        # kakera (private until API stabilizes)
   tsconfig.json / tsconfig.build.json
   AGENTS.md / README.md
 ```
 
-`example/` consumes the framework via `"workers-routes": "file:.."`. The framework is single-package (no monorepo / `packages/` dir).
+`example/` consumes the framework via `"kakera": "file:.."`. The framework is single-package (no monorepo / `packages/` dir).
 
 ## How it works
 
-### Dev mode (`workers-routes/dev`)
+### Dev mode (`kakera/dev`)
 
 1. Request → host worker.
 2. Host extracts `routeName` from the first path segment (`/users/123` → `users`, `/` → `index`).
@@ -40,7 +42,7 @@ workers-routes/
 5. On cache miss, dynamically `import('@cloudflare/worker-bundler')` and call `createWorker({ files: { 'index.ts': source, 'package.json': JSON.stringify({ dependencies }) } })`. `dependencies` comes from the consumer's `pkg.dependencies` passed via the `dev({ dependencies })` factory.
 6. LOADER mounts the bundled worker; host forwards the request (subpath rewritten).
 
-### Prod mode (`workers-routes/prod`)
+### Prod mode (`kakera/prod`)
 
 1. Same routing.
 2. `env.ASSETS.fetch('/<dir>/<route>.js')` — `dir` defaults to `''` (no prefix). Configurable via `prod({ dir })`.
@@ -54,7 +56,7 @@ Earlier iterations tried a single host with `WORKERSKIT_DEV` `define`-based dead
 1. `define` had to be duplicated between top-level and `env.production` in `wrangler.jsonc` (wrangler doesn't inherit env config).
 2. esbuild emits `esbuild.wasm` (≈14 MB) as an orphan chunk whenever a dynamic `import('@cloudflare/worker-bundler')` is _statically reachable_ — even if dead at runtime. Tree-shaking of the JS doesn't drop the wasm asset.
 
-Splitting into `dev.ts` and `prod.ts` files (separate subpath exports `workers-routes/dev`, `workers-routes/prod`) means the prod build never _imports_ `dev.ts`. The dynamic `import()` is never seen → no wasm emission. Confirmed: prod bundle is **1.65 KiB** with no `esbuild.wasm`.
+Splitting into `dev.ts` and `prod.ts` files (separate subpath exports `kakera/dev`, `kakera/prod`) means the prod build never _imports_ `dev.ts`. The dynamic `import()` is never seen → no wasm emission. Confirmed: prod bundle is **1.65 KiB** with no `esbuild.wasm`.
 
 **Do not re-add a barrel that re-exports both `dev` and `prod`.** That triggers the wasm emission again. `src/index.ts` is type-only on purpose.
 
@@ -142,7 +144,7 @@ bun run deploy       # bun run build && wrangler deploy src/prod.ts --assets dis
 
 ## Status / next steps
 
-- [x] Split host into `workers-routes/dev` (runtime bundler) and `workers-routes/prod` (pre-built)
+- [x] Split host into `kakera/dev` (runtime bundler) and `kakera/prod` (pre-built)
 - [x] Per-route bundling via `bun build` (each entry self-contained)
 - [x] Source-hash LOADER cache key in dev
 - [ ] Configurable `compatibilityDate` (currently `'2026-03-24'` hardcoded in both modes)

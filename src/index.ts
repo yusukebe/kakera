@@ -1,1 +1,1 @@
-export type { WorkersRoutesBindings } from './shared.js'
+export type { KakeraBindings } from './shared.js'

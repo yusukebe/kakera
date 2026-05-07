@@ -1,4 +1,4 @@
-import { makeHandler, type WorkersRoutesBindings } from './shared.js'
+import { makeHandler, type KakeraBindings } from './shared.js'
 
 export interface DevOptions {
   dependencies?: Record<string, string>
@@ -6,7 +6,7 @@ export interface DevOptions {
 
 const makeLoad = (options: DevOptions) => {
   const dependencies = options.dependencies ?? {}
-  return async (env: WorkersRoutesBindings, routeName: string) => {
+  return async (env: KakeraBindings, routeName: string) => {
     const tsRes = await env.ASSETS.fetch(new Request(`http://dummy/${routeName}.ts`))
     if (!tsRes.ok) {
       return null

@@ -1,5 +1,5 @@
 {
-  "name": "workers-routes-example",
+  "name": "kakera-example",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "hono": "^4.7.0",
-    "workers-routes": "file:.."
+    "kakera": "file:.."
   },
   "devDependencies": {
     "typescript": "^6.0.3",

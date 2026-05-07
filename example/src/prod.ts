@@ -1,1 +1,1 @@
-export { default } from 'workers-routes/prod'
+export { default } from 'kakera/prod'

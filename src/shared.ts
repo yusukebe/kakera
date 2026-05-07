@@ -1,11 +1,11 @@
-export interface WorkersRoutesBindings {
+export interface KakeraBindings {
   ASSETS: Fetcher
   LOADER: WorkerLoader
 }
 
 export function makeHandler(
-  load: (env: WorkersRoutesBindings, routeName: string) => Promise<WorkerStub | null>
-): ExportedHandler<WorkersRoutesBindings> {
+  load: (env: KakeraBindings, routeName: string) => Promise<WorkerStub | null>
+): ExportedHandler<KakeraBindings> {
   return {
     async fetch(request, env) {
       const url = new URL(request.url)
